@@ -10,15 +10,15 @@ final class Init
     public static function get_services()
     {
         return [
-            Pages\Admin::class
-            Base\Enqueue::class
+            Pages\Admin::class,
+            Base\Enqueue::class,
+            Base\SettingsLinks::class
         ];
     }
     public static function register_services()
     {
-        foreach(self::get_services() as $class)
-        {
-            $service = self::instantiate( $class);
+        foreach (self::get_services() as $class) {
+            $service = self::instantiate($class);
             if (method_exists($service, 'register'))
             {
                 $service->register();
@@ -31,17 +31,7 @@ final class Init
     }
 }
 
-// function register()
-//     {
-//         add_filter("plugin_action_links_$this->plugin", array( $this, 'settings_link'));
-//     }
-//     function settings_link( $links ){
-//         $settings_link = '<a href="admin.php?page=AK_Mapping_Service">Settings</a>';
-//         array_push($links, $settings_link);
-//         return $links;
-//     }
 
- 
 //     /**
 //      * Appends a message to the bottom of a single post including the number of followers and the last Tweet.
 //      *
@@ -143,4 +133,3 @@ final class Init
 //     //deactivation
 //     register_deactivation_hook(__FILE__, array($akMappingService, 'deactivate'));
 // }
-// // TODO: Change define( 'WP_DEBUG', true ); to false.  wp-config-sample.php
