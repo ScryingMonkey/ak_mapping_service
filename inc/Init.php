@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package AK_Mapping_Service
+ */
+
+namespace Inc;
 
 final class Init
 {
@@ -6,14 +11,15 @@ final class Init
     {
         return [
             Pages\Admin::class
+            Base\Enqueue::class
         ];
     }
     public static function register_services()
     {
-        foreach self::get_services() as $class)
+        foreach(self::get_services() as $class)
         {
             $service = self::instantiate( $class);
-            if (method_exists($sevice, 'register'))
+            if (method_exists($service, 'register'))
             {
                 $service->register();
             }
@@ -27,7 +33,6 @@ final class Init
 
 // function register()
 //     {
-//         add_action('wp_enqueue_scripts', array($this,'enqueue'));
 //         add_filter("plugin_action_links_$this->plugin", array( $this, 'settings_link'));
 //     }
 //     function settings_link( $links ){
@@ -35,24 +40,7 @@ final class Init
 //         array_push($links, $settings_link);
 //         return $links;
 //     }
-//     function enqueue() {
-//         wp_enqueue_style('mypluginstyle', plugins_url('/assets/mystyle.css', __FILE__));
-//     }
 
-//     function ak_render_custom_page(){
-//         ?>
-//         <div class='wrap'>
-//          <h2></h2>
-//         </div>
-//         <?php
-//       }
-//       function ak_render_about_page(){
-//         ?>
-//         <div class='wrap'>
-//          <h2></h2>
-//         </div>
-//         <?php
-//       }
  
 //     /**
 //      * Appends a message to the bottom of a single post including the number of followers and the last Tweet.

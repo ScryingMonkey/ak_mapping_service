@@ -1,12 +1,16 @@
 <?php
 
+/**
+ *  @package AK_Mapping_Service
+ */
+
+namespace Inc\Pages;
+
 class Admin
 {
     public function register()
     {
-        add_action('admin_menu', array($this,'add_admin_pages'));
-        add_action('admin_enqueue_scripts', array($this,'enqueue'));
-       
+        add_action('admin_menu', array($this,'add_admin_pages'));      
     }
     public function add_admin_pages()
     {
@@ -31,6 +35,6 @@ class Admin
         $this->my_plugin_screen_name  = add_menu_page($page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position);
     }
     function admin_index(){
-        require_once plugin_dir_path( __FILE__ ) . 'templates/admin-index.php';
+        require_once PLUGIN_PATH . 'templates/admin-index.php';
     }
 }

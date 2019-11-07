@@ -2,7 +2,7 @@
 /**
  * @package AK_Mapping_Service
  */
-namespace Inc;
+namespace Inc\Base;
 
 class Activate
 {
