@@ -6,7 +6,9 @@
 
 namespace Inc\Pages;
 
-class Admin
+use \Inc\Base\BaseController;
+
+class Admin extends BaseController
 {
     public function register()
     {
@@ -35,6 +37,6 @@ class Admin
         $this->my_plugin_screen_name  = add_menu_page($page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position);
     }
     function admin_index(){
-        require_once PLUGIN_PATH . 'templates/admin-index.php';
+        require_once $this->plugin_path . 'templates/admin-index.php';
     }
 }
