@@ -1,0 +1,17 @@
+{
+    "name": "clif/ak-mapping-service",
+    "description": "A plugin to allow easy access to the Advanced Kiosks mapping api.",
+    "type": "project",
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Clif Boyd",
+            "email": "clif@advancedkiosks.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4":{ "Inc\\":"./inc" }
+    }
+}
