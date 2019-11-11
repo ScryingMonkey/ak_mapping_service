@@ -12,14 +12,12 @@ use \Inc\Api\SettingsApi;
 class Admin extends BaseController
 {
     public $settings;
+    public $pages;
+    public $subpages;
 
     public function __construct(){
         $this->settings = new SettingsApi();
-    }
-    public function register()
-    {
-        // add_action('admin_menu', array($this,'add_admin_pages'));      
-        $pages = [
+        $this->pages = [
             [
                 'page_title' => "AK Mapping Service Page",
                 'menu_title' => "AK Mapping Service",
@@ -30,32 +28,34 @@ class Admin extends BaseController
                 'position' => 110
             ]
         ];
-                
-        $this->settings->addPages( $pages )->register();
+        $this->subpages = [
+            [
+                'parent_slug' => 'AK_Mapping_Service',
+                'page_title' => 'Best Path Map',
+                'menu_title' => 'Map',
+                'capability' => 'manage_options',
+                'menu_slug' => 'ak_mapping_map',
+                'callback' => function() { echo '<h1>AK Mapping: Best Path Map</h1>';}
+            ],[
+                'parent_slug' => 'AK_Mapping_Service',
+                'page_title' => 'Best Path Walking Instructions',
+                'menu_title' => 'Instructions',
+                'capability' => 'manage_options',
+                'menu_slug' => 'ak_mapping_instructions',
+                'callback' => function() { echo '<h1>AK Mapping: Best Path Walking Instructions</h1>';}
+            ],[
+                'parent_slug' => 'AK_Mapping_Service',
+                'page_title' => 'Brick Search',
+                'menu_title' => 'Search',
+                'capability' => 'manage_options',
+                'menu_slug' => 'ak_mapping_brick_search',
+                'callback' => function() { echo '<h1>AK Mapping: Best Path Brick Search</h1>';}
+            ]
+
+        ];
     }
-    // public function add_admin_pages()
-    // {
-    //     /* 
-    //         page_title: The page title.
-    //         menu_title: The menu title displayed on dashboard.
-    //         capability: Minimum capability to view the menu.
-    //         menu_slug: Unique name used as a slug for menu item.
-    //         function: A callback function used to display page content.
-    //         icon_url: URL to custom image used as icon.
-    //         position: Location in the menu order.
-            
-    //         add_menu_page($page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position);
-    //         */
-    //     $page_title = "AK Mapping Service Page";
-    //     $menu_title = "AK Mapping Service Menu";
-    //     $capability = "manage_options";
-    //     $menu_slug = "AK_Mapping_Service";
-    //     $function = array($this, 'admin_index');
-    //     $icon_url = "dashicons-admin-site-alt3"; // from https://developer.wordpress.org/resource/dashicons/#admin-site-alt3
-    //     $position = plugins_url('/img/AK-logo.png',__DIR__);
-    //     $this->my_plugin_screen_name  = add_menu_page($page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position);
-    // }
-    // function admin_index(){
-    //     require_once $this->plugin_path . 'templates/admin-index.php';
-    // }
+    public function register()
+    {                
+        $this->settings->addPages( $this->pages )->withSubPage('Dashboard')->addSubPages($this->subpages)->register();
+    }
 }
