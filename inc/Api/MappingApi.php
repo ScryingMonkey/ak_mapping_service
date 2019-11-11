@@ -40,7 +40,7 @@ class MappingApi
         foreach(range(0,count($json)) as $i){
             foreach($json as $node){
                 if($node->data->index == $i){
-                    array_push($sorted, $json[$i]);
+                    array_push($sorted, $node);
                 }
             }
         }
