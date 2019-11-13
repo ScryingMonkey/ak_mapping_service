@@ -13,47 +13,51 @@ class MappingApi
         echo '</script>';
     }
     public function register(){
-        add_shortcode('test1', array($this,'html_return_1'));
-        add_shortcode('test2', array($this,'html_return_2'));
-        add_shortcode('test3', array($this,'html_return_3'));
+        add_shortcode('path_instructions', array($this,'print_instructions'));
+        add_shortcode('path_map', array($this,'print_map'));
     }
-    function html_return_1(){
+    function print_instructions(){
+        $steps = $this->get_steps();
+        // $sorted = [];
+        // foreach(range(0,count($json)) as $i){
+        //     foreach($json as $node){
+        //         try {
+        //             if($node->data->index == $i){
+        //                 array_push($sorted, $node);
+        //             }
+        //         } catch (Exception $ex) {
+        //             var_dump($ex);
+        //         }
+        //     }
+        // }
         $html = '<div class="testText">';
-        $html .= "TEST <b>TEST</b> TEST";
+        $html .= "Test Instructions";
         $html .= "</div>";
-        return $html;
-    }
-    function html_return_2(){
-        $json = $this->make_api_request( "", "" );
-        $html = '<div id="html_return_2">';
+        $html .= '<div id="html_return_3">';
         $html .= "<ol>";
-        foreach($json as $node){
-            $html .= '<li>Step ' . $node->data->index . ' : ' . $node->data->instructions . '</li>';            
-        }
-        $html .= "</ol>";
-        $html .= "</div>";
-        return $html;
-    } 
-    function html_return_3(){
-        $json = $this->make_api_request( "", "" );
-        $sorted = [];
-        foreach(range(0,count($json)) as $i){
-            foreach($json as $node){
-                if($node->data->index == $i){
-                    array_push($sorted, $node);
+        foreach($steps as $step){
+            if(array_key_exists('landmark', $step)){
+                $html .= '<li>';
+                $html .= '<span class="ak-instruction-image">';
+                if(array_key_exists('fileName', $step->landmark)){
+                    $html .= '<img src=' . $step->landmark->fileName . '>';
+                } else {
+                    $html .= '<span height="100px" width="100px">';
                 }
-            }
-        }
-
-        $html = '<div id="html_return_3">';
-        $html .= "<ol>";
-        foreach($sorted as $node){
-            $html .= '<li>Step ' . $node->data->index . ' : ' . $node->data->instructions . '</li>';            
+                $html .= '</span>';
+                $html .= '<span class="ak-instruction-text">' . $step->landmark->instructions . '</span>';
+                $html .= '</li>'; 
+            }           
         }
         $html .= "</ol>";
         $html .= "</div>";
         return $html;
     }     
+    function print_map(){
+        $svg = $this->get_map_image();
+        $html = $svg;
+        return $html;
+    }
     /**
      * Appends a message to the bottom of a single post including the number of followers and the last Tweet.
      *
@@ -102,8 +106,6 @@ class MappingApi
      * @return $json    The JSON feed or null if the request failed
      */
     private function make_api_request( $url, $params ) {
-        $url = 'https://fb-functions-getting-started.firebaseapp.com/api/v1/instructions';
-        $params = '';
         try {
             $response = wp_remote_get( $url . "?" . $params );
         } catch ( Exception $ex ) {
@@ -121,6 +123,15 @@ class MappingApi
         return $json;
  
     }
+
+    function getBestPathFromApi(){
+        // $url = 'https://fb-functions-getting-started.firebaseapp.com/api/v1/instructions';
+        // $params = '';
+        $url = 'https://us-central1-map-annotation-tool.cloudfunctions.net/path_narrative';
+        $params = 'userId=auth0|5d976539de2c080c4f8913ff&originSectionName=129A&destinationBrickNumber=34141';
+        $res = $this->make_api_request($url, $params);
+        return $res;
+    }
  
     /**
      * Retrieves the number of followers from the JSON feed
@@ -129,8 +140,12 @@ class MappingApi
      * @param  $json     The mapping json
      * @return           The mag svg.
      */
-    private function get_map_image( $json ) {
-        return ( -1 < $json->data->Svg ) ? $json->data->Svg : -1;
+    private function get_map_image() {
+        $json = $this->getBestPathFromApi();
+        $img = ( !empty($json->data->svg) ) ? $json->data->svg : '[ No image found. ]';
+        $this->console_log("...retrieved map image:");
+        $this->console_log($img);
+        return $img;
     }
  
     /**
@@ -140,7 +155,11 @@ class MappingApi
      * @param  $json     The mapping json
      * @return           The walking instructions.
      */
-    private function get_steps( $json ) {
-        return ( 0 < strlen( $json->data->Steps ) ) ? $json->data->Steps : '[ No steps found. ]';
+    private function get_steps() {
+        $json = $this->getBestPathFromApi();
+        $steps = ( !empty($json->data->steps) ) ? $json->data->steps : [ 'No steps found.' ];
+        $this->console_log("...retrieved best path steps:");
+        $this->console_log($steps);
+        return $steps;
     }
 }

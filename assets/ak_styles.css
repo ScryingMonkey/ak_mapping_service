@@ -2,3 +2,12 @@
     color:lightblue; 
     font-size:300%;
 }
+.ak-instruction-image {
+    width:100px;
+    height:100px;
+    /* background: url(http://goo.gl/vyAs27) no-repeat scroll 0 0; */
+}
+.ak-instruction-text {
+    color:blue; 
+    font-size:100%;
+}
