@@ -33,19 +33,19 @@ class MappingApi
         $html = '<div class="testText">';
         $html .= "Test Instructions";
         $html .= "</div>";
-        $html .= '<div id="html_return_3">';
+        $html .= '<div>';
         $html .= "<ol>";
         foreach($steps as $step){
             if(array_key_exists('landmark', $step)){
                 $html .= '<li>';
-                $html .= '<span class="ak-instruction-image">';
+                $html .= '<div class="ak-instruction-image">';
                 if(array_key_exists('fileName', $step->landmark)){
-                    $html .= '<img src=' . $step->landmark->fileName . '>';
+                    $html .= '<img src="' . $step->landmark->fileName . '" >';
                 } else {
-                    $html .= '<span height="100px" width="100px">';
+                    $html .= '<span></span>';
                 }
-                $html .= '</span>';
-                $html .= '<span class="ak-instruction-text">' . $step->landmark->instructions . '</span>';
+                $html .= '</div>';
+                $html .= '<div class="ak-instruction-text">' . $step->landmark->instructions . '</div>';
                 $html .= '</li>'; 
             }           
         }
