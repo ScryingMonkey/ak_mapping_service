@@ -13,8 +13,9 @@ class MappingApi
         echo '</script>';
     }
     public function register(){
-        add_shortcode('path_instructions', array($this,'print_instructions'));
-        add_shortcode('path_map', array($this,'print_map'));
+        add_shortcode('path_map', array($this,'print_map')); //TODO: Link to var in admin panel
+        add_shortcode('path_instructions', array($this,'print_instructions')); //TODO: Link to var in admin panel
+
     }
     function print_instructions(){
         $steps = $this->get_steps();

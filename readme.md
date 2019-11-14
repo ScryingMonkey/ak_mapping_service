@@ -15,8 +15,7 @@ Shortcodes:
 * \[monument_description] : Description of specified monument.
 * \[path_search_bar] : Search bar for searching for a brick.
 
-Style sheet is located at \assets\ak-styles.css.
-JS script file is located at \assets\ak-scripts.js.
+Style sheet is located at \assets\ak-styles.css.  JS script file is located at \assets\ak-scripts.js.
 
 
 

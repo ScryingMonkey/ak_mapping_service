@@ -1,13 +1,13 @@
 <?php
 /**
  * @package AK_Mapping_Service
- * @version 0.0.2
+ * @version 0.0.5
  */
  /*
  * Plugin Name: AK Mapping Service
  * Description: Provide functions to call the AK Mapping API.
  * Plugin URI: https://www.advancedkiosks.com
- * Version:     0.0.2
+ * Version:     0.0.5
  * Author:      Clif Boyd
  * License:     GPL-2.0+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt

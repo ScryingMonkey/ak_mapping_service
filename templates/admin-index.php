@@ -1,1 +1,0 @@
-<h1>TEST ADMIN INDEX PHP</h2>
