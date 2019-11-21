@@ -11,3 +11,8 @@
     color:lightblue; 
     font-size:100%;
 }
+.ak-mapping-autocomplete-suggestion {
+    border: 1 solid "red";
+    padding: 10px;
+    margin: 10px;
+}

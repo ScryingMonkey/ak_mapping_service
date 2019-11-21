@@ -1,5 +1,5 @@
 <div class="wrap">
-    <h1>TEST ADMIN INDEX PHP</h1>
+    <h1>AK Mapping Service Admin Panel</h1>
     <?php settings_errors(); ?>
 
     <form method="post" action="options.php">

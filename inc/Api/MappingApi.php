@@ -19,18 +19,6 @@ class MappingApi
     }
     function print_instructions(){
         $steps = $this->get_steps();
-        // $sorted = [];
-        // foreach(range(0,count($json)) as $i){
-        //     foreach($json as $node){
-        //         try {
-        //             if($node->data->index == $i){
-        //                 array_push($sorted, $node);
-        //             }
-        //         } catch (Exception $ex) {
-        //             var_dump($ex);
-        //         }
-        //     }
-        // }
         $html = '<div class="testText">';
         $html .= "Test Instructions";
         $html .= "</div>";
@@ -48,6 +36,9 @@ class MappingApi
                 $html .= '</div>';
                 $html .= '<div class="ak-instruction-text">' . $step->landmark->instructions . '</div>';
                 $html .= '</li>'; 
+                if(array_key_exists('placement', $step)){
+                    $html .= "<li>The brick is on the $step->placement. </li>";
+                }
             }           
         }
         $html .= "</ol>";

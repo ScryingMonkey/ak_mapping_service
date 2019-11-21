@@ -26,7 +26,7 @@ class Admin extends BaseController
         $this->setSettings();
         $this->setSections();
         $this->setFields();
-        $this->settings->addPages( $this->pages )->withSubPage('Dashboard')->addSubPages($this->subpages)->register();
+        $this->settings->addPages( $this->pages )->addSubPages($this->subpages)->register();
     }
     public function setPages()
     {
@@ -45,27 +45,28 @@ class Admin extends BaseController
     public function setSubPages()
     {
         $this->subpages = [
+            // [
+            //     'parent_slug' => 'AK_Mapping_Service',
+            //     'page_title' => 'Best Path Map',
+            //     'menu_title' => 'Map',
+            //     'capability' => 'manage_options',
+            //     'menu_slug' => 'ak_mapping_map',
+            //     'callback' => array($this->callbacks,'mapPage')
+            // ],[
+            //     'parent_slug' => 'AK_Mapping_Service',
+            //     'page_title' => 'Best Path Walking Instructions',
+            //     'menu_title' => 'Instructions',
+            //     'capability' => 'manage_options',
+            //     'menu_slug' => 'ak_mapping_instructions',
+            //     'callback' => array($this->callbacks,'instructionsDashboard')
+            // ],
             [
-                'parent_slug' => 'AK_Mapping_Service',
-                'page_title' => 'Best Path Map',
-                'menu_title' => 'Map',
-                'capability' => 'manage_options',
-                'menu_slug' => 'ak_mapping_map',
-                'callback' => array($this->callbacks,'mapPage')
-            ],[
-                'parent_slug' => 'AK_Mapping_Service',
-                'page_title' => 'Best Path Walking Instructions',
-                'menu_title' => 'Instructions',
-                'capability' => 'manage_options',
-                'menu_slug' => 'ak_mapping_instructions',
-                'callback' => array($this->callbacks,'instructionsDashboard')
-            ],[
                 'parent_slug' => 'AK_Mapping_Service',
                 'page_title' => 'Brick Search',
                 'menu_title' => 'Search',
                 'capability' => 'manage_options',
-                'menu_slug' => 'ak_mapping_brick_search',
-                'callback' => function() { }
+                'menu_slug' => 'ak_mapping_search',
+                'callback' => array($this->callbacks,'adminSearchDashboard')
             ]
 
         ];
@@ -89,6 +90,19 @@ class Admin extends BaseController
             ],[
                 'option_group' => 'ak_options_group',
                 'option_name' => 'shortcode_landmark_description',
+            ],
+            [
+                'option_group' => 'ak_search_options_group',
+                'option_name' => 'ak_search_database_name',
+                'callback' => array( $this->callbacks, 'akSearchOptionsGroup')
+            ],
+            [
+                'option_group' => 'ak_search_options_group',
+                'option_name' => 'ak_search_database_username',
+            ],
+            [
+                'option_group' => 'ak_search_options_group',
+                'option_name' => 'ak_search_database_password',
             ]
         ];
         $this->settings->setSettings($args);
@@ -97,11 +111,23 @@ class Admin extends BaseController
     {
         $args = [
             [
-                'id' => 'ak_admin_index',
-                'title' => 'Settings',
-                'callback' => array( $this->callbacks, 'akAdminSection'),
+                'id' => 'ak_admin_summary',
+                'title' => 'Summary',
+                'callback' => array( $this->callbacks, 'akAdminSummarySection'),
                 'page' => 'AK_Mapping_Service'
+            ],
+            [
+                'id' => 'ak_admin_shortcodes',
+                'title' => 'Shortcodes',
+                'callback' => array( $this->callbacks, 'akAdminShortcodesSection'),
+                'page' => 'AK_Mapping_Service'
+            ],[
+                'id' => 'ak_admin_search_settings',
+                'title' => 'Settings',
+                'callback' => array( $this->callbacks, 'akAdminSearchSection'),
+                'page' => 'ak_mapping_search'
             ]
+
         ];
         $this->settings->setSections($args);
     }
@@ -113,7 +139,7 @@ class Admin extends BaseController
                 'title' => 'Shortcode for map image',
                 'callback' => array( $this->callbacks, 'akMapShortCode'),
                 'page' => 'AK_Mapping_Service',
-                'section' => 'ak_admin_index',
+                'section' => 'ak_admin_shortcodes',
                 'args' => array(
                     'label_for' => 'text_example',
                     'class' => 'example-class'
@@ -123,7 +149,7 @@ class Admin extends BaseController
                 'title' => 'Shortcode for best path walking instructions',
                 'callback' => array( $this->callbacks, 'akInstructionsShortCode'),
                 'page' => 'AK_Mapping_Service',
-                'section' => 'ak_admin_index',
+                'section' => 'ak_admin_shortcodes',
                 'args' => array(
                     'label_for' => 'shortcode_instructions',
                     'class' => 'example-class'
@@ -133,7 +159,7 @@ class Admin extends BaseController
                 'title' => 'Shortcode for best path search bar',
                 'callback' => array( $this->callbacks, 'akSearchShortCode'),
                 'page' => 'AK_Mapping_Service',
-                'section' => 'ak_admin_index',
+                'section' => 'ak_admin_shortcodes',
                 'args' => array(
                     'label_for' => 'shortcode_search',
                     'class' => 'example-class'
@@ -143,7 +169,7 @@ class Admin extends BaseController
                 'title' => 'Shortcode for Landmark Image',
                 'callback' => array( $this->callbacks, 'akLandmarkImageShortCode'),
                 'page' => 'AK_Mapping_Service',
-                'section' => 'ak_admin_index',
+                'section' => 'ak_admin_shortcodes',
                 'args' => array(
                     'label_for' => 'shortcode_landmark_image',
                     'class' => 'example-class'
@@ -153,9 +179,39 @@ class Admin extends BaseController
                 'title' => 'Shortcode for Landmark Description',
                 'callback' => array( $this->callbacks, 'akLandmarkDescriptionShortCode'),
                 'page' => 'AK_Mapping_Service',
-                'section' => 'ak_admin_index',
+                'section' => 'ak_admin_shortcodes',
                 'args' => array(
                     'label_for' => 'shortcode_landmark_description',
+                    'class' => 'example-class'
+                )
+            ],[
+                'id' => 'ak_search_database_name',
+                'title' => 'Database Name',
+                'callback' => array( $this->callbacks, 'akDatabaseName'),
+                'page' => 'ak_mapping_search',
+                'section' => 'ak_admin_search_settings',
+                'args' => array(
+                    'label_for' => 'ak_search_database_name',
+                    'class' => 'example-class'
+                )
+            ],[
+                'id' => 'ak_search_database_username',
+                'title' => 'Database Username',
+                'callback' => array( $this->callbacks, 'akDatabaseUsername'),
+                'page' => 'ak_mapping_search',
+                'section' => 'ak_admin_search_settings',
+                'args' => array(
+                    'label_for' => 'ak_search_database_username',
+                    'class' => 'example-class'
+                )
+            ],[
+                'id' => 'ak_search_database_password',
+                'title' => 'Database Password',
+                'callback' => array( $this->callbacks, 'akDatabasePassword'),
+                'page' => 'ak_mapping_search',
+                'section' => 'ak_admin_search_settings',
+                'args' => array(
+                    'label_for' => 'ak_search_database_password',
                     'class' => 'example-class'
                 )
             ]
