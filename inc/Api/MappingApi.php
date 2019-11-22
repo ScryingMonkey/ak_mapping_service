@@ -7,6 +7,8 @@ namespace Inc\Api;
 
 class MappingApi
 {
+    public $url;
+
     function console_log( $data ){
         echo '<script>';
         echo 'console.log('. json_encode( $data ) .')';
@@ -16,6 +18,8 @@ class MappingApi
         add_shortcode('path_map', array($this,'print_map')); //TODO: Link to var in admin panel
         add_shortcode('path_instructions', array($this,'print_instructions')); //TODO: Link to var in admin panel
 
+        // $url = 'https://us-central1-map-annotation-tool.cloudfunctions.net/path_narrative';
+        $this->url = 'https://us-central1-ak-mapping-api.cloudfunctions.net/path_narrative';
     }
     function print_instructions(){
         $steps = $this->get_steps();
@@ -97,9 +101,15 @@ class MappingApi
      * @return $params  A string of all the params for the api call
      * @return $json    The JSON feed or null if the request failed
      */
-    private function make_api_request( $url, $params ) {
+    public function make_api_request( $url, $params ) {
+        $this->console_log("> ak-mapping-mapping.make_api_request( $url, $params )");
+        $this->console_log("...api call wp_remote_get( \"$url?$params\" )");
         try {
-            $response = wp_remote_get( $url . "?" . $params );
+            $response = '{ERROR:"NO_DATA"}';
+            // $response = wp_remote_get( "$url?$params" );
+            $response = wp_remote_get( "https://us-central1-ak-mapping-api.cloudfunctions.net/path_narrative?userId=auth0|5d976539de2c080c4f8913ff&originSectionName=129A&destinationBrickNumber=34141");
+            // $response =  Requests::get( $url . "?" . $params );
+            $this->console_log("...response: $response");
         } catch ( Exception $ex ) {
             return "{data: \"Api request returned an error. $ex\"}";
         }
@@ -119,9 +129,19 @@ class MappingApi
     function getBestPathFromApi(){
         // $url = 'https://fb-functions-getting-started.firebaseapp.com/api/v1/instructions';
         // $params = '';
-        $url = 'https://us-central1-map-annotation-tool.cloudfunctions.net/path_narrative';
-        $params = 'userId=auth0|5d976539de2c080c4f8913ff&originSectionName=129A&destinationBrickNumber=34141';
-        $res = $this->make_api_request($url, $params);
+        $originSectionName = get_query_var( 'originSectionName', 'NO_DATA' );
+        $destinationBrickNumber = get_query_var( 'destinationBrickNumber', 'NO_DATA' );
+
+        $params = "";
+        $params .= "userId=auth0|5d976539de2c080c4f8913ff";
+        // $params .= "&originSectionName=$originSectionName";
+        $params .= "&originSectionName=129A";
+        // $params .= "&destinationBrickNumber=$destinationBrickNumber";
+        $params .= "&destinationBrickNumber=34141";
+        // $params = 'userId=auth0|5d976539de2c080c4f8913ff&originSectionName=129A&destinationBrickNumber=34141';
+        http://marine.advancedkiosksmarketing.com/result/?originSectionName=129A&destinationBrickNumber=34141
+        $this->console_log("... making api request ( $this->url, $params )");
+        $res = $this->make_api_request( $this->url, $params );
         return $res;
     }
  

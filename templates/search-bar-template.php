@@ -20,10 +20,10 @@
                 class="ak-mapping-search-origin-dropdown">
             </select>
 
-            <input 
+            <!-- <input 
                 type="submit" 
                 value="Submit" 
-                onclick="searchSubmitHandler()" />
+                onclick="searchSubmitHandler()" /> -->
 
         </form>
 

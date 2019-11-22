@@ -74,9 +74,8 @@ function updateSuggestionBox(suggs,suggsDiv){
                 .split(' ')
                 .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
                 .join(' ');
-            b.innerHTML += `<p>Brick ID(${s.brickNumber}): ${honoree}<br>${s.description}</p>`;
+            b.innerHTML += `<div class="ak-mapping-search-nameresult">Brick ID(${s.brickNumber}): ${honoree}</div><p>${s.description}</p>`;
             b.addEventListener('click',() => {
-                SEARCH_INPUT.value = s;
                 searchSubmitHandler(s);
             });
             suggsDiv.appendChild(b);
@@ -95,10 +94,11 @@ function searchSubmitHandler(suggSelection){
             //     searchTerm: "1|abigail adrian|abel albert",
             //     section: "A"
             // }
+
     // get id of selected brick, and origin section number
-    brickId = suggsSelection.brickNumber;
+    let brickId = suggSelection.brickNumber;
     let originSection = ORIGIN_SELECT.value;
-    console.log(`...redirecting to directions for origin section [${originSection}] and destination brick id [${suggSelection}]`);
+    console.log(`...redirecting to directions for origin section [${originSection}] and destination brick id [${brickId}]`);
 
     // blank out suggestions
     inputChangeHandler("");
@@ -106,6 +106,22 @@ function searchSubmitHandler(suggSelection){
     SUGGS_DIV.innerHTML = "";
 
     // Navigate to suggestions page for selected brickId.
+    rootUrl = 'http://marine.advancedkiosksmarketing.com';
+    params = `originSectionName=${originSection}&destinationBrickNumber=${brickId}`;
+    window.location.href = `${rootUrl}/result?${params}`;
+
+    // $.ajax({
+    //     type: "POST",
+    //     url: "some.php",
+    //     data: { name: "John" }
+    // }).done(function( msg ) {
+    //     alert( "Data Saved: " + msg );
+    // });
+
+    // var xhttp = new XMLHttpRequest();
+    //   xhttp.open("GET", "myroutine.php", true);
+    //   xhttp.send();
+    
 
     // let q = `SELECT * FROM ${dbName} WHERE ${column}="${searchTerm}" LIMIT 5`;
     // queryDb(q).then(res => {
@@ -113,6 +129,29 @@ function searchSubmitHandler(suggSelection){
     //     updateResultsDiv(res,RESULTS_DIV)
     // });
 } 
+// function queryDb(query){
+//     console.log(`>> queryDb("${query}")`);
+//     return new Promise((resolve,reject) => {
+//         var data = new FormData();
+//         data.append("query", query );
+//         var xhr = new XMLHttpRequest();
+//         xhr.open("POST", dbUrl, true);
+//         xhr.setRequestHeader("charset", "UTF-8");
+//         xhr.setRequestHeader("cache-control", "no-cache");
+//         xhr.send(data);     
+//         xhr.addEventListener("readystatechange", function () {
+//             if (this.readyState === 4) {
+//                 console.log(`...got reponse from db: [${xhr.response}]`);
+//                 let res = (JSON.parse(xhr.response)).data;
+//                 console.log(`...got reponse from db:<${typeof res}>`);
+//                 console.dir(res);
+//                 resolve(res);
+//             }
+//         });
+
+//     });
+
+// }
 // Curl autosuggest list from api
 async function getAutoSuggestList(){
     console.log(`>> ak-mapping-search.getAutoSuggestList()`);

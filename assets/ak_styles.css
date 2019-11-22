@@ -16,3 +16,34 @@
     padding: 10px;
     margin: 10px;
 }
+.ak-mapping-autocomplete-suggestion {
+    font-size:14px;
+    line-height:18px;
+    border-top:1px #A28585 solid;
+    padding-top:20px;
+    text-transform:uppercase;
+}
+#ak-mapping-search-input {
+    background:#ece8db;
+    border:0px;
+    padding:10px;
+    border-radius:10px;
+    margin-left:5px;
+}
+#ak-mapping-search-origin-dropdown {
+    padding:10px;
+    border:0px;
+    background:#ece8db;
+    border-radius:10px 10px 0 0;
+    margin-left:5px;
+}
+.ak-mapping-search-suggs {
+    margin-top:40px;
+}
+#ak-mapping-search-form {
+    text-transform: uppercase;
+    margin-bottom:20px;
+}
+.ak-mapping-search-nameresult {
+    font-weight:bold;
+}
