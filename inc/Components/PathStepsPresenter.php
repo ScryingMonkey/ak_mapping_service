@@ -3,11 +3,14 @@
  * @package AK_Mapping_Service
  */
 
-namespace Inc\Api;
+namespace Inc\Components;
 
-class MappingApi
+use \Inc\Api\MappingApi; 
+
+class PathStepsPresenter 
 {
-    public $brick;
+    public $_map;  // mapping service
+    public $shortcode;
 
     function console_log( $data ){
         echo '<script>';
@@ -15,14 +18,16 @@ class MappingApi
         echo '</script>';
     }
     public function register(){
-        add_shortcode('brick_summary', array($this,'print_brick_summary')); //TODO: Link to var in admin panel
-
-        $this->brick = $this->getBrick();
+        $this->_map = new MappingApi();
+        $this->shortcode = 'path_instructions';
+        add_shortcode($this->shortcode, array($this,'print_instructions')); //TODO: Link to var in admin panel
     }
-    function print_brick_summary(){
-        $this->console_log("...loading [search_bar].");
-
-        $steps = $this->get_steps();
+    function print_instructions(){
+        $this->console_log("...loading [$this->shortcode].");
+        // $steps = array($this->_map, 'pathSteps');
+        $steps = $this->_map->pathSteps;
+        $this->console_log($steps);
+        
         $html = '<div class="testText">';
         $html .= "Test Instructions";
         $html .= "</div>";
@@ -48,23 +53,5 @@ class MappingApi
         $html .= "</ol>";
         $html .= "</div>";
         return $html;
-    }   
-    public function print_searchbar(){
-        $this->console_log("...loading [search_bar].");
-        ob_start();
-        include "$this->plugin_path/templates/search-bar-template.php";
-        return ob_get_clean(); 
-    }
-    public function getBrick(){
-        $brick = [];
-        $brick = [
-            "brickNumber"=>"34141",
-            "description"=>"Col. Leonard G Hicks\r\nWW II, Korean War\r\nUSMC, Bronze Star",
-            "donor"=>"albert abe",
-            "honor"=>"adele adrian",
-            "searchTerm"=>"34141|adele adrian|albert abe",
-            "section"=>"186"
-        ];
-        return $brick;
-    }
-}
+    }     
+}   

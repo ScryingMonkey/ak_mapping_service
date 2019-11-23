@@ -5,94 +5,62 @@
 
 namespace Inc\Api;
 
-class MappingApi
-{
-    public $url;
+use \Inc\Base\BaseController; 
 
-    function console_log( $data ){
+class MappingApi extends BaseController
+{
+    public static $url;
+
+    public static $destinationBrick;
+    public static $pathSteps;
+    public static $pathStepsPlacement;
+    public static $map;
+    public static $originSectionName;
+    public static $destinationBrickNumber;
+
+    private function console_log( $data ){
         echo '<script>';
         echo 'console.log('. json_encode( $data ) .')';
         echo '</script>';
     }
-    public function register(){
-        add_shortcode('path_map', array($this,'print_map')); //TODO: Link to var in admin panel
-        add_shortcode('path_instructions', array($this,'print_instructions')); //TODO: Link to var in admin panel
+    private function init_static_vars(){
+        self::$destinationBrick  = 'NO_DATA';
+        self::$pathSteps  = 'NO_DATA';
+        self::$pathStepsPlacement  = 'NO_DATA';
+        self::$map  = 'NO_DATA';
 
+        self::$originSectionName = 'NO_DATA';
+        self::$destinationBrickNumber  = 'NO_DATA';
+    }
+    private function get_static_vars(){
+        // $class = new ReflectionClass($this);
+        // $vars = $class->getStaticProperties();
+        $vars = [
+            'url' => self::$url,
+            'destinationBrick' => self::$destinationBrick,
+            'pathSteps' => self::$pathSteps,
+            'pathStepsPlacement' => self::$pathStepsPlacement,
+            'map' => self::$map,
+            'originSectionName' => self::$originSectionName,
+            'destinationBrickNumber' => self::$destinationBrickNumber
+        ];
+        return $vars;
+    }
+    private function log_static_vars(){
+        $this->console_log("...printing static vars:");
+        $this->console_log( $this->get_static_vars() );
+    }
+    public function register(){
         // $url = 'https://us-central1-map-annotation-tool.cloudfunctions.net/path_narrative';
-        $this->url = 'https://us-central1-ak-mapping-api.cloudfunctions.net/path_narrative';
+        self::$url = 'https://us-central1-ak-mapping-api.cloudfunctions.net/path_narrative';
+        
+        $this->init_static_vars();
+        $this->log_static_vars();
+
+        $this->getBestPathFromApi();
+        $this->log_static_vars();
+
     }
-    function print_instructions(){
-        $steps = $this->get_steps();
-        $html = '<div class="testText">';
-        $html .= "Test Instructions";
-        $html .= "</div>";
-        $html .= '<div>';
-        $html .= "<ol>";
-        foreach($steps as $step){
-            if(array_key_exists('landmark', $step)){
-                $html .= '<li>';
-                $html .= '<div class="ak-instruction-image">';
-                if(array_key_exists('fileName', $step->landmark)){
-                    $html .= '<img src="' . $step->landmark->fileName . '" >';
-                } else {
-                    $html .= '<span></span>';
-                }
-                $html .= '</div>';
-                $html .= '<div class="ak-instruction-text">' . $step->landmark->instructions . '</div>';
-                $html .= '</li>'; 
-                if(array_key_exists('placement', $step)){
-                    $html .= "<li>The brick is on the $step->placement. </li>";
-                }
-            }           
-        }
-        $html .= "</ol>";
-        $html .= "</div>";
-        return $html;
-    }     
-    function print_map(){
-        $svg = $this->get_map_image();
-        $html = $svg;
-        return $html;
-    }
-    /**
-     * Appends a message to the bottom of a single post including the number of followers and the last Tweet.
-     *
-     * @access public
-     * @param  $content    The post content
-     * @return $content    The post content with the mapping api information appended to it.
-     */
-    function display_mapping_information() {
-        $content = "";
-        $url = 'https://us-central1-map-annotation-tool.cloudfunctions.net/path_narrative';
-        $params = 'userId=auth0|5d976539de2c080c4f8913ff&origin=129A&destination=220';
-        // If we're on a single post or page...
-        if ( is_single() ) {
-            
-            // ...attempt to make a response to twitter. Note that you should replace your username here!
-            if ( null == ( $json_response = $this->make_api_request( $url, $params ) ) ) {
-                // ...display a message that the request failed
-                $html = '
-        <div id="ak-mapping-content">';
-        $html .= 'There was a problem communicating with the AK Mapping API..';
-        $html .= '</div>;
-        <!-- /#ak-mapping-content -->';
-            // ...otherwise, read the information provided by api
-            } else {
-                $steps = get_steps();
-                $html = '
-        <div id="ak-mapping-content">';
-        $html .= "<ul>";
-                foreach( $steps as $step ) {
-                $html .= "<li>{$step['OriginSectionName']} to {$step['DestinationSectionName']}</li>";
-        $html .= "</ul>"; 
-        $html .= '</div>
-        <!-- /#ak-mapping-content -->';
-                }
-            } 
-            $content .= $html;
-        } 
-        return $content;
-    } 
     /**
      * Attempts to request the specified user's JSON feed from Twitter
      *
@@ -101,7 +69,7 @@ class MappingApi
      * @return $params  A string of all the params for the api call
      * @return $json    The JSON feed or null if the request failed
      */
-    public function make_api_request( $url, $params ) {
+    private function make_api_request( $url, $params ) {
         $this->console_log("> ak-mapping-mapping.make_api_request( $url, $params )");
         $this->console_log("...api call wp_remote_get( \"$url?$params\" )");
         try {
@@ -125,13 +93,22 @@ class MappingApi
         return $json;
  
     }
-
-    function getBestPathFromApi(){
+    private function getParamsFromUrl($key){
+        if (isset($_GET[$key])) {
+            return $_GET[$key];
+          } else {
+            //Handle the case where there is no parameter
+            $this->console_log("...could not find \$_GET[$key] in url.");
+            return 'No_DATA_FOUND';
+          }
+    }
+    public function getBestPathFromApi(){
         // $url = 'https://fb-functions-getting-started.firebaseapp.com/api/v1/instructions';
         // $params = '';
-        $originSectionName = get_query_var( 'originSectionName', 'NO_DATA' );
-        $destinationBrickNumber = get_query_var( 'destinationBrickNumber', 'NO_DATA' );
+        self::$originSectionName = $this->getParamsFromUrl('originSectionName');
+        self::$destinationBrickNumber = $this->getParamsFromUrl('destinationBrickNumber');
 
+        $url = self::$url;
         $params = "";
         $params .= "userId=auth0|5d976539de2c080c4f8913ff";
         // $params .= "&originSectionName=$originSectionName";
@@ -139,39 +116,88 @@ class MappingApi
         // $params .= "&destinationBrickNumber=$destinationBrickNumber";
         $params .= "&destinationBrickNumber=34141";
         // $params = 'userId=auth0|5d976539de2c080c4f8913ff&originSectionName=129A&destinationBrickNumber=34141';
-        http://marine.advancedkiosksmarketing.com/result/?originSectionName=129A&destinationBrickNumber=34141
-        $this->console_log("... making api request ( $this->url, $params )");
-        $res = $this->make_api_request( $this->url, $params );
+        // http://marine.advancedkiosksmarketing.com/result/?originSectionName=129A&destinationBrickNumber=34141
+        $this->console_log("... making api request ( $url, $params )");
+        
+        // get mock data from file
+        $pathMockDataPath = $this->plugin_url . 'assets/datamocks/map-bestpath-mock.json';
+        $res = json_decode(file_get_contents($pathMockDataPath), true);
+
+        // make api call
+        // $res = $this->make_api_request( $this->url, $params );  //TODO: Need to fix authentication issue before making api call.
+        
+        // parse api response and set global vars
+        $this->parse_api_response( $res );
+
         return $res;
     }
- 
-    /**
-     * Retrieves the number of followers from the JSON feed
-     *
-     * @access private
-     * @param  $json     The mapping json
-     * @return           The mag svg.
-     */
-    private function get_map_image() {
-        $json = $this->getBestPathFromApi();
-        $img = ( !empty($json->data->svg) ) ? $json->data->svg : '[ No image found. ]';
-        $this->console_log("...retrieved map image:");
-        $this->console_log($img);
-        return $img;
+    private function parse_api_response($json) {
+        $this->console_log("> parse_api_response(\$json);");
+        $this->console_log($json);
+        // parse steps
+
+        $steps = ( !empty($json['data']['steps']) ) ? $json['data']['steps'] : ['  ERROR: No steps found.'];
+        self::$pathSteps = $steps;
+        // parse steps destination brick
+        if (count($steps) > 0){
+            self::$destinationBrick = ( !empty(end($steps)['brick'])  ) ? end($steps)['brick'] : '  ERROR: No destination brick found.';
+            // parse steps placement
+            self::$pathStepsPlacement = ( !empty(end($steps)['placement'])  ) ? end($steps)['placement'] : '  ERROR: No destination brick found.';
+            // parse map
+            self::$map = ( !empty($json['data']['svg']) ) ? $json['data']['svg'] : '  ERROR: No destination brick found.';
+        }
+        //set mock data
+        // self::$destinationBrick = $this->getBrick();
     }
- 
-    /**
-     * Retrieves the walking instructions
-     *
-     * @access private
-     * @param  $json     The mapping json
-     * @return           The walking instructions.
-     */
-    private function get_steps() {
-        $json = $this->getBestPathFromApi();
-        $steps = ( !empty($json->data->steps) ) ? $json->data->steps : [ 'No steps found.' ];
-        $this->console_log("...retrieved best path steps:");
-        $this->console_log($steps);
-        return $steps;
+    public function getBrick(){
+        $brick = [
+            "brickNumber"=>"34141",
+            "description"=>"Col. Leonard G Hicks\r\nWW II, Korean War\r\nUSMC, Bronze Star",
+            "donor"=>"albert abe",
+            "honor"=>"adele adrian",
+            "searchTerm"=>"34141|adele adrian|albert abe",
+            "section"=>"186"
+        ];
+        return $brick;
     }
+    /**
+     * Appends a message to the bottom of a single post including the number of followers and the last Tweet.
+     *
+     * @access public
+     * @param  $content    The post content
+     * @return $content    The post content with the mapping api information appended to it.
+     */
+    // public function display_mapping_information() {
+        //     $content = "";
+        //     $url = 'https://us-central1-map-annotation-tool.cloudfunctions.net/path_narrative';
+        //     $params = 'userId=auth0|5d976539de2c080c4f8913ff&origin=129A&destination=220';
+        //     // If we're on a single post or page...
+        //     if ( is_single() ) {
+                
+        //         // ...attempt to make a response to twitter. Note that you should replace your username here!
+        //         if ( null == ( $json_response = $this->make_api_request( $url, $params ) ) ) {
+        //             // ...display a message that the request failed
+        //             $html = '
+        //     <div id="ak-mapping-content">';
+        //     $html .= 'There was a problem communicating with the AK Mapping API..';
+        //     $html .= '</div>;
+        //     <!-- /#ak-mapping-content -->';
+        //         // ...otherwise, read the information provided by api
+        //         } else {
+        //             $steps = get_steps();
+        //             $html = '
+        //     <div id="ak-mapping-content">';
+        //     $html .= "<ul>";
+        //             foreach( $steps as $step ) {
+        //             $html .= "<li>{$step['OriginSectionName']} to {$step['DestinationSectionName']}</li>";
+        //     $html .= "</ul>"; 
+        //     $html .= '</div>
+        //     <!-- /#ak-mapping-content -->';
+        //             }
+        //         } 
+        //         $content .= $html;
+        //     } 
+        //     return $content;
+        // } 
 }
+

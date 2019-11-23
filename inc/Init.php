@@ -14,7 +14,10 @@ final class Init
             Base\Enqueue::class,
             Base\SettingsLinks::class,
             Api\MappingApi::class,
-            Api\SearchApi::class
+            Api\SearchApi::class,
+            Components\BrickSummaryPresenter::class,
+            Components\PathStepsPresenter::class,
+            Components\MapSvgPresenter::class
         ];
     }
     public static function register_services()
