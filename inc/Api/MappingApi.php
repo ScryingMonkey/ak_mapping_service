@@ -55,7 +55,7 @@ class MappingApi extends BaseController
         self::$url = 'https://us-central1-ak-mapping-api.cloudfunctions.net/path_narrative';
         
         $this->init_static_vars();
-        $this->log_static_vars();
+        // $this->log_static_vars();
 
         $this->getBestPathFromApi();
         $this->log_static_vars();
@@ -121,7 +121,7 @@ class MappingApi extends BaseController
         
         // get mock data from file
         $pathMockDataPath = $this->plugin_url . 'assets/datamocks/map-bestpath-mock.json';
-        $res = json_decode(file_get_contents($pathMockDataPath), true);
+        $res = json_decode(file_get_contents($pathMockDataPath), false);
 
         // make api call
         // $res = $this->make_api_request( $this->url, $params );  //TODO: Need to fix authentication issue before making api call.
@@ -133,33 +133,22 @@ class MappingApi extends BaseController
     }
     private function parse_api_response($json) {
         $this->console_log("> parse_api_response(\$json);");
-        $this->console_log($json);
-        // parse steps
+        // $this->console_log($json);
 
-        $steps = ( !empty($json['data']['steps']) ) ? $json['data']['steps'] : ['  ERROR: No steps found.'];
+        //parse object
+        // parse steps
+        $steps = ( !empty($json->data->steps) ) ? $json->data->steps : ['  ERROR: No steps found.'];
         self::$pathSteps = $steps;
         // parse steps destination brick
         if (count($steps) > 0){
-            self::$destinationBrick = ( !empty(end($steps)['brick'])  ) ? end($steps)['brick'] : '  ERROR: No destination brick found.';
+            self::$destinationBrick = ( !empty(end($steps)->brick)  ) ? end($steps)->brick : '  ERROR: No destination brick found.';
             // parse steps placement
-            self::$pathStepsPlacement = ( !empty(end($steps)['placement'])  ) ? end($steps)['placement'] : '  ERROR: No destination brick found.';
+            self::$pathStepsPlacement = ( !empty(end($steps)->placement )  ) ? end($steps)->placement : '  ERROR: No destination brick found.';
             // parse map
-            self::$map = ( !empty($json['data']['svg']) ) ? $json['data']['svg'] : '  ERROR: No destination brick found.';
+            self::$map = ( !empty($json->data->svg) ) ? $json->data->svg : '  ERROR: No destination brick found.';
         }
-        //set mock data
-        // self::$destinationBrick = $this->getBrick();
     }
-    public function getBrick(){
-        $brick = [
-            "brickNumber"=>"34141",
-            "description"=>"Col. Leonard G Hicks\r\nWW II, Korean War\r\nUSMC, Bronze Star",
-            "donor"=>"albert abe",
-            "honor"=>"adele adrian",
-            "searchTerm"=>"34141|adele adrian|albert abe",
-            "section"=>"186"
-        ];
-        return $brick;
-    }
+
     /**
      * Appends a message to the bottom of a single post including the number of followers and the last Tweet.
      *

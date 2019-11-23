@@ -24,9 +24,9 @@ class MapSvgPresenter
     }
     function print_map(){
         $this->console_log("...loading [$this->shortcode].");
-        // $svg = array($this->_map, 'map');
-        $svg = $this->_map->map;
-        $this->console_log($svg);
+
+        $svg = MappingApi::$map;
+        // $this->console_log($svg);
         return $svg;
     }
 }   

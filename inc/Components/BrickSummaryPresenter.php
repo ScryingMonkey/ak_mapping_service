@@ -25,12 +25,8 @@ class BrickSummaryPresenter
     function print_brick_summary(){
         $this->console_log("...loading [$this->shortcode].");
         
-        // array( $this->_map, 'getBestPathFromApi');
-
-        // $brick = $this->getBrick();
-        // $brick = array($this->_map, 'destinationBrick')[0];
-        // $brick = $this->_map->destinationBrick;
-        $brick = MappingApi::$destinationBrick;
+        $brick = (object) MappingApi::$destinationBrick;
+        $this->console_log("...brick <" . gettype($brick) . ">");
         $this->console_log($brick);
         // $brick = [
         //     "brickNumber"=>"34141",

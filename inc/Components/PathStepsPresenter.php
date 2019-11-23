@@ -24,8 +24,8 @@ class PathStepsPresenter
     }
     function print_instructions(){
         $this->console_log("...loading [$this->shortcode].");
-        // $steps = array($this->_map, 'pathSteps');
-        $steps = $this->_map->pathSteps;
+
+        $steps = MappingApi::$pathSteps;
         $this->console_log($steps);
         
         $html = '<div class="testText">';
@@ -34,6 +34,9 @@ class PathStepsPresenter
         $html .= '<div>';
         $html .= "<ol>";
         foreach($steps as $step){
+            $step = $step;
+            $this->console_log("...processing step <" . gettype($step) .">;");
+            $this->console_log($step);
             if(array_key_exists('landmark', $step)){
                 $html .= '<li>';
                 $html .= '<div class="ak-instruction-image">';
