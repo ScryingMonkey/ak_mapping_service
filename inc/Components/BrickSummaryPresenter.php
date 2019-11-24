@@ -42,7 +42,6 @@ class BrickSummaryPresenter
         $html .= "<h3>Inscription:</h3>";
         $html .= "<p>$brick->description</p>";
         $html .= "</div>";
-        $html .= "</div>";
         return $html;
     }   
     // public function print_searchbar(){

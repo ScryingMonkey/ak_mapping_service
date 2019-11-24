@@ -40,12 +40,13 @@ class PathStepsPresenter
                 // check if intersection or landmark     
                 $html .= '<div class="ak-instruction-image">';  
                 if(array_key_exists('isIntersection', $step->landmark)){
-                    $this->console_log("...array_key_exists('isIntersection', \$step->landmark: true");
+                    // $this->console_log("...array_key_exists('isIntersection', \$step->landmark: true");
                     $html .= $this->_map->getIntersectionThumbnail($step->mapCroppedArea);
                 }         
                 elseif(array_key_exists('fileName', $step->landmark)){
-                    $this->console_log("...array_key_exists('fileName', \$step->landmark): true");
-                    $html .= '<img src="' . $step->landmark->fileName . '" >';
+                    // $this->console_log("...array_key_exists('fileName', \$step->landmark): true");
+                    // $html .= '<img src="' . $step->landmark->fileName . '" >';
+                    $html .= $this->_map->getLandmarkImage($step->landmark->fileName);
                 }
                 else {
                     $html .= '<span></span>';

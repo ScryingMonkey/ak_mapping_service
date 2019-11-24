@@ -19,9 +19,9 @@ class MappingApi extends BaseController
     public static $destinationBrickNumber;
 
     private function console_log( $data ){
-        echo '<script>';
-        echo 'console.log('. json_encode( $data ) .')';
-        echo '</script>';
+        // echo '<script>';
+        // echo 'console.log('. json_encode( $data ) .')';
+        // echo '</script>';
     }
     private function init_static_vars(){
         self::$destinationBrick  = 'NO_DATA';
@@ -153,15 +153,15 @@ class MappingApi extends BaseController
         //     'x' => 767.87164578272,
         //     'y' => 257.21360501678
         // ];
-        $this->console_log("...\$mappedCroppedArea<" . gettype($mapCroppedArea) . ">:");
-        $this->console_log($mapCroppedArea);
+        // $this->console_log("...\$mappedCroppedArea<" . gettype($mapCroppedArea) . ">:");
+        // $this->console_log($mapCroppedArea);
         $itn = self::$map;  //intersection thumbnail
         // $this->console_log("...inital \$itn");
         // $this->console_log($itn);
 
         $view_box_dims = implode(' ', [$mapCroppedArea->x, $mapCroppedArea->y, $mapCroppedArea->height, $mapCroppedArea->width]);
-        $this->console_log("...new \$view_box_dims?");
-        $this->console_log($view_box_dims);
+        // $this->console_log("...new \$view_box_dims?");
+        // $this->console_log($view_box_dims);
 
         $itn = $this->replaceAttr('viewBox="', $view_box_dims, $itn); //TODO: Ugly.  Replace with a way to set attr directly.
 
@@ -177,6 +177,14 @@ class MappingApi extends BaseController
         $oldValue = substr($itn,$avsi, ($avei-$avsi));
         $itn = str_replace ($oldValue, $newValue, $itn);
         return $itn;
+    }
+    public function getLandmarkImage($filename){ //TODO: Landmark filenames are wrong.  Need to fix filenames on firestore.
+        $imgtag = "";
+        $imagePath = $this->plugin_url . 'assets/img/landmarks/' . $filename;
+        $imgtag = '<img src="' . $imagePath . '" >';
+        // $this->console_log("...returing imgtag:");
+        // $this->console_log($imgtag);
+        return $imgtag;
     }
 
     /**
