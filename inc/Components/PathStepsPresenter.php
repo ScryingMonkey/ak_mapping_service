@@ -29,14 +29,11 @@ class PathStepsPresenter
         $this->console_log($steps);
         
         $html = '<div class="testText">';
-        $html .= "Test Instructions";
+        $html .= "Demo Walking Instructions";
         $html .= "</div>";
         $html .= '<div>';
         $html .= "<ol>";
         foreach($steps as $step){
-            $step = $step;
-            $this->console_log("...processing step <" . gettype($step) .">;");
-            $this->console_log($step);
             if(array_key_exists('landmark', $step)){
                 $html .= '<li>';
                 $html .= '<div class="ak-instruction-image">';

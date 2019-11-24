@@ -24,11 +24,8 @@ class BrickSummaryPresenter
     }
     function print_brick_summary(){
         $this->console_log("...loading [$this->shortcode].");
-        
+
         $brick = (object) MappingApi::$destinationBrick;
-        $this->console_log("...brick <" . gettype($brick) . ">");
-        $this->console_log($brick);
-        // $brick = [
         //     "brickNumber"=>"34141",
         //     "description"=>"Col. Leonard G Hicks\r\nWW II, Korean War\r\nUSMC, Bronze Star",
         //     "donor"=>"albert abe",
@@ -38,10 +35,15 @@ class BrickSummaryPresenter
         // ];
 
         $html = '<div class="ak-mapping-brick-summary">';
-        $html .= "<span>Number: $brick->brickNumber</span>";
-        $html .= "<span>Honoree: $brick->honor</span>";
+        $html .= "<h3>Number:</h3>";
+        $html .= "<p>$brick->brickNumber</p>";
+        $html .= "<h3>Honoree:</h3>";
+        $html .= "<p>" . ucwords($brick->honor) . "</p>";
+        $html .= "<h3>Inscription:</h3>";
         $html .= "<p>$brick->description</p>";
         $html .= "</div>";
+        $html .= "</div>";
+        $html .= MappingApi::getIntersectionThumbnail("TEST");
         return $html;
     }   
     // public function print_searchbar(){

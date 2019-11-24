@@ -18,7 +18,7 @@ class MappingApi extends BaseController
     public static $originSectionName;
     public static $destinationBrickNumber;
 
-    private function console_log( $data ){
+    private static function console_log( $data ){
         echo '<script>';
         echo 'console.log('. json_encode( $data ) .')';
         echo '</script>';
@@ -47,18 +47,16 @@ class MappingApi extends BaseController
         return $vars;
     }
     private function log_static_vars(){
-        $this->console_log("...printing static vars:");
-        $this->console_log( $this->get_static_vars() );
+        self::console_log("...printing static vars:");
+        self::console_log( $this->get_static_vars() );
     }
     public function register(){
         // $url = 'https://us-central1-map-annotation-tool.cloudfunctions.net/path_narrative';
         self::$url = 'https://us-central1-ak-mapping-api.cloudfunctions.net/path_narrative';
         
         $this->init_static_vars();
+        $this->getBestPathFromApi(); //TODO: Replace this with a call when results page is loaded.
         // $this->log_static_vars();
-
-        $this->getBestPathFromApi();
-        $this->log_static_vars();
 
     }
     /**
@@ -70,14 +68,14 @@ class MappingApi extends BaseController
      * @return $json    The JSON feed or null if the request failed
      */
     private function make_api_request( $url, $params ) {
-        $this->console_log("> ak-mapping-mapping.make_api_request( $url, $params )");
-        $this->console_log("...api call wp_remote_get( \"$url?$params\" )");
+        self::console_log("> ak-mapping-mapping.make_api_request( $url, $params )");
+        self::console_log("...api call wp_remote_get( \"$url?$params\" )");
         try {
             $response = '{ERROR:"NO_DATA"}';
             // $response = wp_remote_get( "$url?$params" );
             $response = wp_remote_get( "https://us-central1-ak-mapping-api.cloudfunctions.net/path_narrative?userId=auth0|5d976539de2c080c4f8913ff&originSectionName=129A&destinationBrickNumber=34141");
             // $response =  Requests::get( $url . "?" . $params );
-            $this->console_log("...response: $response");
+            self::console_log("...response: $response");
         } catch ( Exception $ex ) {
             return "{data: \"Api request returned an error. $ex\"}";
         }
@@ -88,8 +86,8 @@ class MappingApi extends BaseController
             // $json = null;
             return "{data: \"Could not decode json. $ex\"}";
         }
-        $this->console_log("...reponse from api get [$url?$params]");
-        $this->console_log($json);
+        self::console_log("...reponse from api get [$url?$params]");
+        self::console_log($json);
         return $json;
  
     }
@@ -98,7 +96,7 @@ class MappingApi extends BaseController
             return $_GET[$key];
           } else {
             //Handle the case where there is no parameter
-            $this->console_log("...could not find \$_GET[$key] in url.");
+            self::console_log("...could not find \$_GET[$key] in url.");
             return 'No_DATA_FOUND';
           }
     }
@@ -117,7 +115,7 @@ class MappingApi extends BaseController
         $params .= "&destinationBrickNumber=34141";
         // $params = 'userId=auth0|5d976539de2c080c4f8913ff&originSectionName=129A&destinationBrickNumber=34141';
         // http://marine.advancedkiosksmarketing.com/result/?originSectionName=129A&destinationBrickNumber=34141
-        $this->console_log("... making api request ( $url, $params )");
+        self::console_log("... making api request ( $url, $params )");
         
         // get mock data from file
         $pathMockDataPath = $this->plugin_url . 'assets/datamocks/map-bestpath-mock.json';
@@ -132,8 +130,8 @@ class MappingApi extends BaseController
         return $res;
     }
     private function parse_api_response($json) {
-        $this->console_log("> parse_api_response(\$json);");
-        // $this->console_log($json);
+        self::console_log("> parse_api_response(\$json);");
+        self::console_log($json);
 
         //parse object
         // parse steps
@@ -147,6 +145,38 @@ class MappingApi extends BaseController
             // parse map
             self::$map = ( !empty($json->data->svg) ) ? $json->data->svg : '  ERROR: No destination brick found.';
         }
+    }
+    public static function getIntersectionThumbnail($mapCroppedArea){
+        $mapCroppedArea = (object) [
+            'height' => 100,
+            'width' => 100,
+            'x' => 767.87164578272,
+            'y' => 257.21360501678
+        ];
+        self::console_log("...\$mappedCroppedArea<" . gettype($mapCroppedArea) . ">:");
+        self::console_log($mapCroppedArea);
+        $itn = self::$map;  //intersection thumbnail
+        self::console_log("...inital \$itn");
+        self::console_log($itn);
+
+        $view_box_dims = implode(' ', [$mapCroppedArea->x, $mapCroppedArea->y, $mapCroppedArea->height, $mapCroppedArea->width]);
+        self::console_log("...new \$view_box_dims?");
+        self::console_log($view_box_dims);
+
+        $itn = self::replaceViewBox($itn, $view_box_dims);
+
+        self::console_log("...new \$itn?");
+        self::console_log($itn);
+        return $itn;
+    }
+    private static function replaceViewBox($itn, $view_box_dims){
+
+        $vbsi = strpos( $itn , 'viewBox="' ) + strlen('viewBox="'); //index of beginning of viewbox dims
+        $vbei = strpos( $itn , '" ', $vbsi ); //index of end of viewbox dims
+        $ovb = substr($itn,$vbsi, ($vbei-$vbsi));
+        $nvb = $view_box_dims;
+        $itn = str_replace ($ovb, $nvb, $itn);
+        return $itn;
     }
 
     /**
