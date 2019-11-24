@@ -43,7 +43,6 @@ class BrickSummaryPresenter
         $html .= "<p>$brick->description</p>";
         $html .= "</div>";
         $html .= "</div>";
-        $html .= MappingApi::getIntersectionThumbnail("TEST");
         return $html;
     }   
     // public function print_searchbar(){

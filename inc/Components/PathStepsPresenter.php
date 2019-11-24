@@ -12,7 +12,7 @@ class PathStepsPresenter
     public $_map;  // mapping service
     public $shortcode;
 
-    function console_log( $data ){
+    private function console_log( $data ){
         echo '<script>';
         echo 'console.log('. json_encode( $data ) .')';
         echo '</script>';
@@ -35,14 +35,23 @@ class PathStepsPresenter
         $html .= "<ol>";
         foreach($steps as $step){
             if(array_key_exists('landmark', $step)){
-                $html .= '<li>';
-                $html .= '<div class="ak-instruction-image">';
-                if(array_key_exists('fileName', $step->landmark)){
+                $html .= '<li>';   
+                             
+                // check if intersection or landmark     
+                $html .= '<div class="ak-instruction-image">';  
+                if(array_key_exists('isIntersection', $step->landmark)){
+                    $this->console_log("...array_key_exists('isIntersection', \$step->landmark: true");
+                    $html .= $this->_map->getIntersectionThumbnail($step->mapCroppedArea);
+                }         
+                elseif(array_key_exists('fileName', $step->landmark)){
+                    $this->console_log("...array_key_exists('fileName', \$step->landmark): true");
                     $html .= '<img src="' . $step->landmark->fileName . '" >';
-                } else {
+                }
+                else {
                     $html .= '<span></span>';
                 }
                 $html .= '</div>';
+
                 $html .= '<div class="ak-instruction-text">' . $step->landmark->instructions . '</div>';
                 $html .= '</li>'; 
                 if(array_key_exists('placement', $step)){
