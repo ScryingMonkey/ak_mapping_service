@@ -46,7 +46,7 @@ class PathStepsPresenter
                 elseif(array_key_exists('fileName', $step->landmark)){
                     // $this->console_log("...array_key_exists('fileName', \$step->landmark): true");
                     // $html .= '<img src="' . $step->landmark->fileName . '" >';
-                    $html .= $this->_map->getLandmarkImage($step->landmark->fileName);
+                    $html .= $this->_map->getLandmarkThumbnailImage($step->landmark->fileName);
                 }
                 else {
                     $html .= '<span></span>';

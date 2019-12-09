@@ -18,8 +18,8 @@ class Enqueue extends BaseController
         wp_enqueue_style('ak-mapping-script', $this->plugin_url . 'assets/ak_styles.css' );
         wp_register_script( 'ak-mapping-script', $this->plugin_url . 'assets/ak_scripts.js', array(), $this->version, false );	  
         wp_enqueue_script('ak-mapping-script');
-       
 
+        $this->setUpScriptVars();
     }
     function setUpScriptVars(){
         $mockBrickJsonFilePath = $this->plugin_url . 'assets/datamocks/map-annotation-tool-bricks-info-export.json';
@@ -28,17 +28,13 @@ class Enqueue extends BaseController
         $mockOriginsJsonFilePath = $this->plugin_url . 'assets/datamocks/map-origin-options.json';
         $mockOriginsObj = json_decode(file_get_contents($mockOriginsJsonFilePath), true); // decode the JSON into an associative array
         
-        $mockBestPathJsonFilePath = $this->plugin_url . 'assets/datamocks/map-bestpath-mock.json';
-        $mockBestPath = json_decode(file_get_contents($mockBestPathJsonFilePath), true); // decode the JSON into an associative array
-
         wp_localize_script( 
             'ak-mapping-script', 
             'ak_mapping_vars', 
             array( 
                 'AUTOSUGGEST_INDEX' => $mockBrickObj, 
-                'ORIGIN_SECTION_OPTIONS' => $mockOriginsObj,
-                'MOCK_BEST_PATH' => $mockBestPath
-            ) 
+                'ORIGIN_SECTION_OPTIONS' => $mockOriginsObj
+            )
         );
     }
 }

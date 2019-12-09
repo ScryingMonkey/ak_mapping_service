@@ -19,9 +19,9 @@ class MappingApi extends BaseController
     public static $destinationBrickNumber;
 
     private function console_log( $data ){
-        // echo '<script>';
-        // echo 'console.log('. json_encode( $data ) .')';
-        // echo '</script>';
+        echo '<script>';
+        echo 'console.log('. json_encode( $data ) .')';
+        echo '</script>';
     }
     private function init_static_vars(){
         self::$destinationBrick  = 'NO_DATA';
@@ -184,6 +184,22 @@ class MappingApi extends BaseController
         $imgtag = '<img src="' . $imagePath . '" >';
         // $this->console_log("...returing imgtag:");
         // $this->console_log($imgtag);
+        return $imgtag;
+    }
+    public function getLandmarkThumbnailImage($file){ //TODO: Landmark filenames are wrong.  Need to fix filenames on firestore.
+        $imgtag = "";
+        $iod = strrpos($file, "."); // index of dot
+        $fileName = substr($file, 0, $iod);  //TODO: Fix this after fixing landmark filenames
+        $fileExtension = substr($file, $iod);
+        $this->console_log("\$iod:$iod; \$fileName:$fileName;");
+
+        $imagePath = $this->plugin_url . 'assets/img/landmarks/thumbnails/' . $fileName . '_thumbnail' . $fileExtension;
+        $imgtag = '<img src="' . $imagePath . '" >';
+
+        $this->console_log("...returing imgtag:");
+        $this->console_log($imagePath);
+        $this->console_log($imgtag);
+
         return $imgtag;
     }
 

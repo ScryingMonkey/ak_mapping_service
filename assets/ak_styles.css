@@ -29,6 +29,7 @@
     padding:10px;
     border-radius:10px;
     margin-left:5px;
+    margin-right:20px;
 }
 #ak-mapping-search-origin-dropdown {
     padding:10px;
@@ -54,3 +55,4 @@
     color:black;
     font-weight: bold;
 }
+
