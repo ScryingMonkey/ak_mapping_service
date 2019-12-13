@@ -25,6 +25,7 @@ class SearchApi extends BaseController
         include "$this->plugin_path/templates/search-bar-template.php";
         return ob_get_clean(); 
     }
+
     // private function make_api_request( $url, $params ) 
     // {
     //     try {

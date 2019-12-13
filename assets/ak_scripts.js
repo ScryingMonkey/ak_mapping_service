@@ -14,27 +14,105 @@ function addAttrs(el, attrs){
     });
 }
 // Searches data for searchTerm, and returns up to 5 matches.
-function autosuggestBrickSearch(searchTerm, data){
-    console.log(`>> ak-mapping-search.autosuggestBrickSearch( ${searchTerm}, [ data : ${data.length}] )`);
-    
-    let res = [];
+function autosuggestBrickSearch(searchTerm, data, filters=[]){
+    console.log(`>> ak-mapping-search.autosuggestBrickSearch( \"${searchTerm}\", [ data : ${data.length}],  [ filters : ${filters.length}])`);
+    console.dir(filters);
+    console.dir(data);
+    let res = [];    
+
     if(searchTerm && searchTerm.length > 0 && data.length > 0){
         searchTerm = searchTerm.toLowerCase();
+        filters = ['Honor','Donor']; // TODO: dummy value.  Remove when receiving filters from form
+        filters = filters.map( x => x.toLowerCase()); // converts all filter keys to lower case
 
         data.some( (brick) => {
-            brick.searchTerm.split("|").some( t => {
-                if(t.toLowerCase().includes(searchTerm)){
-                    res.push(brick);
-                    return true;
-                }
-            });
+            let keys = null;
+            if (filters !== undefined || filters.length > 0) {
+                // if filters is not empty, search only fields in filters
+                keys = Object.keys(brick)
+                    .map( x => x.toLowerCase()) // converts all brick keys to lower case
+                    .filter( x=> filters.includes(x)); // removes keys that are not in filters
+                keys.some( key => {
+                    if(brick[key].includes(searchTerm)){
+                        res.push(brick);
+                        return true;
+                    }
+                });
+            } else {  
+                // if filters is empty, search all searchTerms (index of all fields)
+                brick.searchTerm.split("|").some( t => {
+                    if(t.toLowerCase().includes(searchTerm)){
+                        res.push(brick);
+                        return true;
+                    }
+                });
+            }
+
+
+
             return res.length >= 5;
         });
-        // suggs = (suggs) ? res : [];
     }
+    
     console.log(`...returning res (${res.length})`);
     return res;
 }
+function checkForBrickClusters(data){
+    // "25904" : {
+    //     "brickNumber" : "25904",
+    //     "description" : "LtCol\r\nDavid E. Phillips\r\nUSMC 1984-2008",
+    //     "donor" : "adam adams",
+    //     "honor" : "abraham adams",
+    //     "searchTerm" : "25904|abraham adams|adam adams",
+    //     "section" : "152"
+    //   },
+
+    let res = {};
+    let l = "[[";
+    let keysToCheck = ['honor','section','donor'];
+
+    keysToCheck.map( k2c => {
+        res[k2c] = {};
+        data.map( (brick, index) => {
+            if(brick[k2c] in res[k2c]){
+                l += ".";
+                res[k2c][brick[k2c]].push(brick);
+            } else {
+                l +="+";
+                res[k2c][brick[k2c]] = [brick];
+            }
+            if(index < 10){
+                console.log(`...checking [${k2c}]  brick[k2c](${brick[k2c]}) in res[k2c](${res[k2c]}) : ${(brick[k2c] in res[k2c])}`);
+                console.dir(brick[k2c]);
+                console.dir(res[k2c]);
+            }
+        });
+        l +="]\n\n[";
+
+    });
+    l += "]]";
+    console.log(l);
+    return res;
+}
+function printBrickClusters(data){
+    // data = {
+    //     honoree:[
+    //         Joe Smoe : [...bricks...],
+    //         Tom Smoe : [...bricks...],
+    //         ...
+    //     ],
+    //     donor:[...],
+    //     section:[...]
+    // };
+
+    Object.keys(data).map( (k2c) => {
+        // console.log(`...printing [${k2c}]`);
+        console.log(`Unique ${k2c} values: ${Object.keys(data[k2c]).length}`)
+        console.log(`...Object.keys(data[${k2c}]).length = ${Object.keys(data[k2c]).length};`);
+        console.dir(data[k2c]);
+    });
+}
+
 // Called on dom loaded to create Origin dropdown box options
 function updateOriginsDropdown(origins){
     console.log(`>> ak-mapping-search.updateOriginsDropdown(${origins})`);
